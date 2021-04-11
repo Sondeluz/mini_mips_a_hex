@@ -1,0 +1,15 @@
+lw r1, 0(r0)
+lw r2, 4(r0)
+add r3, r1, r2
+sw r3, 4(r0)
+beq r3, r3, 0
+slti r3, r1, 0
+slti r4, r1, 1
+slti r5, r1, 2
+lw r2, 0(r0)
+nop
+nop
+nop
+add r1, r1, r2
+add r1, r1, r2
+add r1, r1, r2
