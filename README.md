@@ -5,7 +5,9 @@ Entrada necesaria: fichero codigo.txt al mismo nivel que compilador.py, con inst
   
   Ejemplos:
     add r1, r2, r3
+    
     beq r1, r4, 8
+    
     sw r3, 4(r0)
 
 Salida: instrucciones correspondientes pasadas a hexadecimal, línea a línea, en salida.txt
