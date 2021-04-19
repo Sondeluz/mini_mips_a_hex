@@ -25,7 +25,6 @@ def identificar_operacion(codigo):
     if (codigo == "add"):
         return instruccion_bin.ADD
     elif (codigo == "sub"):
-        print("es sub(en identificar_operacion)")
         return instruccion_bin.SUB
     elif (codigo == "or"):
         return instruccion_bin.OR
