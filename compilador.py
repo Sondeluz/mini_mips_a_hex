@@ -25,6 +25,7 @@ def identificar_operacion(codigo):
     if (codigo == "add"):
         return instruccion_bin.ADD
     elif (codigo == "sub"):
+        print("es sub(en identificar_operacion)")
         return instruccion_bin.SUB
     elif (codigo == "or"):
         return instruccion_bin.OR
@@ -54,15 +55,16 @@ def traducir_operando(op):
 
 ##########################################################################################
 # traduce funct a binario con 6 dígitos
-def traducir_funct(operacion_bin):
+def traducir_funct(codigo):
     # Se pasarán los 3 LSB de funct a la ALU como ctrl
-    if (operacion_bin == instruccion_bin.ADD):
+    if (codigo == "add"):
         return "000000"
-    elif (operacion_bin == instruccion_bin.SUB):
+    elif (codigo == "sub"):
+        print("es sub")
         return "000001"
-    elif (operacion_bin == instruccion_bin.AND):
+    elif (codigo == "and"):
         return "000010"
-    elif (operacion_bin == instruccion_bin.OR):
+    elif (codigo == "or"):
         return "000011"
 
 
@@ -74,14 +76,14 @@ def traducir_funct(operacion_bin):
 
 # add  rd, rs, rt
 # ...
-def traducir_tipo_r(operacion_bin, operandos):
+def traducir_tipo_r(operacion_bin, operandos, codigo):
     rd_bin = traducir_operando(operandos[0].lstrip('r')) # quitando r
     rs_bin = traducir_operando(operandos[1].lstrip('r')) # quitando r
     rt_bin = traducir_operando(operandos[2].rstrip().lstrip('r')) # quitando r y '\n'
     
     shamt_bin = "00000" # no se hacen shifts
     
-    funct_bin = traducir_funct(operacion_bin)
+    funct_bin = traducir_funct(codigo) # hay que pasar el codigo de string, porque los enum al tener el mismo valor para add/sub/and/or, se confunden
     
     print("op: ", operacion_bin.value, "rs:", rs_bin, "rt:", rt_bin, "rd:", rd_bin, "shamt:", shamt_bin, "funct:", funct_bin)
     instr_bin = operacion_bin.value+rs_bin+rt_bin+rd_bin+shamt_bin+funct_bin
@@ -145,6 +147,7 @@ def traducir_tipo_i(operacion_bin, operandos, PC):
         #PC = 20: queremos saltar a la posición 0, y el procesador calcula la dirección haciendo PC+4+ 4*Ëxt(inm) por eso ponemos FFFB: 4*FFFB+0014 = 0000
         
         inmed = (int(operandos[2]) - PC - 4)/4
+
            
         print("inmed calculado:", inmed)    
         
@@ -189,11 +192,11 @@ for line in lines:
     operandos_operacion = line.split(" ", 1) # [operacion] , [operandos]
     
     operacion_bin = identificar_operacion(operandos_operacion[0])
-    
+
     if operacion_bin in {instruccion_bin.ADD, instruccion_bin.SUB, instruccion_bin.OR, instruccion_bin.AND}:
         operandos = operandos_operacion[1].split(", ") 
         # ([rd], [rs], [rt]) en aritmeticas, ([rt], [inmed(rs)]) en lw/sw, ([rs], [rt], [inm]) en beq, ([rt], [rs], [inmed]) en slti
-        instr_hex = traducir_tipo_r(operacion_bin, operandos)
+        instr_hex = traducir_tipo_r(operacion_bin, operandos, operandos_operacion[0])
     
     elif operacion_bin in {instruccion_bin.LW, instruccion_bin.SW, instruccion_bin.BEQ, instruccion_bin.SLTI}:
         operandos = operandos_operacion[1].split(", ") 
