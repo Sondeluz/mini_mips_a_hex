@@ -3,6 +3,7 @@
 #   beq r1, r4, 8
 #   sw r3, 4(r0)
 #   ...
+# los beq deben tener como @ de salto la respectiva a cómo ve las líneas un PC (saltar a la linea 2 -> 8 ---> beq r0, r0, 8)
 
 # salida: instrucciones correspondientes pasadas a hexadecimal, línea a línea, en salida.txt
 
@@ -59,7 +60,6 @@ def traducir_funct(codigo):
     if (codigo == "add"):
         return "000000"
     elif (codigo == "sub"):
-        print("es sub")
         return "000001"
     elif (codigo == "and"):
         return "000010"
@@ -86,7 +86,7 @@ def traducir_tipo_r(operacion_bin, operandos, codigo):
     
     print("op: ", operacion_bin.value, "rs:", rs_bin, "rt:", rt_bin, "rd:", rd_bin, "shamt:", shamt_bin, "funct:", funct_bin)
     instr_bin = operacion_bin.value+rs_bin+rt_bin+rd_bin+shamt_bin+funct_bin
-    print(instr_bin, "length:", len(instr_bin))
+    #print(instr_bin, "length:", len(instr_bin))
     
     instr_hex = hex(int(instr_bin, 2))
     instr_hex = instr_hex[2:] # quita 0x, como con 0b
@@ -116,9 +116,9 @@ def traducir_tipo_i(operacion_bin, operandos, PC):
         
         op2 = operandos[1].split("(") # [inm], [rs)\'n']
         inmediato = op2[0]
-        
-        rs = op2[1].rstrip(")'\n'")
-        
+        #print(op2[1])
+        rs = op2[1][0:2] #sin ")'\n'"
+        #print(rs)
         rs_bin = traducir_operando(rs.lstrip('r'))
         
         inmed_bin = format(int(op2[0]), '#018b') #b: en binario, 07: 2 caracteres para 0b, resto para el digito(16)
@@ -141,11 +141,7 @@ def traducir_tipo_i(operacion_bin, operandos, PC):
         
         rt_bin = traducir_operando(operandos[1].lstrip('r')) # quitando r
         
-        
-        #la @ calculada es PC+4+4*Ext(inm)
-        #PC = 20: queremos saltar a la posición 0, y el procesador calcula la dirección haciendo PC+4+ 4*Ëxt(inm) por eso ponemos FFFB: 4*FFFB+0014 = 0000
-        
-        inmed = (int(operandos[2]) - PC - 4)/4
+        inmed = (int(operandos[2]) - PC - 4)/4 # (@ de salto(0,4,8,12...) - PC - 4)/4
 
            
         print("inmed calculado:", inmed)    
@@ -154,7 +150,14 @@ def traducir_tipo_i(operacion_bin, operandos, PC):
         
         inmed_bin = inmed_bin[2:] # quita 0b
         
-        print("inmed_bin: ", inmed_bin)
+        #print("inmed_bin: ", inmed_bin)
+        
+        #print(len(inmed_bin))
+        
+        while (len(inmed_bin) < 16): # añade padding en el caso de que salga un inmediato pequeño de menos de 16 bits (1...)
+            inmed_bin = "0"+inmed_bin
+        
+        #print(inmed_bin)
 
     
     print("op: ", operacion_bin.value, "rs:", rs_bin, "rt:", rt_bin, "inmed:", inmed_bin)
